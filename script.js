@@ -95,12 +95,15 @@ function buildBeatGrid(lv) {
 
 function startLevel(idx) {
   initAudio();
-  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
   gs.levelIdx = idx;
   buildBeatGrid(LEVELS[idx]);
   $('lv-name').textContent = `${idx+1}. ${LEVELS[idx].name}`;
   showScreen('game');
-  startListen();
+  if (audioCtx && audioCtx.state !== 'running') {
+    audioCtx.resume().then(() => startListen()).catch(() => startListen());
+  } else {
+    startListen();
+  }
 }
 
 function startListen() {
@@ -191,13 +194,13 @@ function handleTap() {
   btn.classList.add('pressed'); setTimeout(() => btn.classList.remove('pressed'), 90);
   if (nearest) {
     nearest.matched = true;
-    if      (nearestDist < lv.interval * d.perfectT) { nearest.score=100;        nearest.grade='perfect'; showFeedback('Perfect!','perfect'); }
-    else if (nearestDist < lv.interval * d.goodT)    { nearest.score=d.goodPts;  nearest.grade='good';    showFeedback('Good!','good'); }
-    else                                              { nearest.score=d.okPts;    nearest.grade='ok';      showFeedback('Ok','ok'); }
+    if      (nearestDist < lv.interval * d.perfectT) { nearest.score=100;        nearest.grade='perfect'; showFeedback('Perfect!','perfect'); playClick(true); }
+    else if (nearestDist < lv.interval * d.goodT)    { nearest.score=d.goodPts;  nearest.grade='good';    showFeedback('Good!','good');    playClick(true); }
+    else                                              { nearest.score=d.okPts;    nearest.grade='ok';      showFeedback('Ok','ok');         playClick(true); }
     const el = gs.prevActiveEl;
     if (el) { el.classList.add(`hit-${nearest.grade}`); setTimeout(() => el.classList.remove(`hit-${nearest.grade}`), 200); }
   } else {
-    gs.extraTaps++; showFeedback('Extra!','extra');
+    gs.extraTaps++; showFeedback('Extra!','extra'); playClick(false);
   }
 }
 
