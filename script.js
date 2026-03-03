@@ -9,12 +9,19 @@ const LEVELS = [
   { name:'Master',  sub:'Full speed ahead',   interval:220, pattern:[1,0,1,1,0,1,0,0,1,1,0,1,0,0,1,0], hint:'The ultimate challenge',         listenLoops:3, playLoops:4 },
 ];
 
+const DIFF = {
+  easy:   { okWindow:0.48, perfectT:0.16, goodT:0.30, okPts:50,  goodPts:85  },
+  normal: { okWindow:0.38, perfectT:0.12, goodT:0.22, okPts:35,  goodPts:70  },
+  hard:   { okWindow:0.28, perfectT:0.08, goodT:0.16, okPts:35,  goodPts:70  },
+};
+
 const SAVE_KEY = 'beat-tap-v1';
 function loadSave() { try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch { return {}; } }
 function writeSave() { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }
 const save = loadSave();
 if (!save.scores)   save.scores   = {};
-if (!save.unlocked) save.unlocked = [0];
+if (!save.unlocked)  save.unlocked  = [0];
+if (!save.difficulty) save.difficulty = 'normal';
 writeSave();
 
 let audioCtx = null;
@@ -65,6 +72,12 @@ function renderHome() {
     `;
     if (!locked) card.addEventListener('click', () => startLevel(i));
     list.appendChild(card);
+  });
+}
+
+function renderDifficulty() {
+  document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.diff === save.difficulty);
   });
 }
 
@@ -166,7 +179,8 @@ function endPlay() {
 function handleTap() {
   if (gs.phase !== 'play') return;
   const now = performance.now(), lv = LEVELS[gs.levelIdx];
-  const okWindow = lv.interval * 0.38;
+  const d = DIFF[save.difficulty];
+  const okWindow = lv.interval * d.okWindow;
   let nearest = null, nearestDist = Infinity;
   for (const exp of gs.expectedTaps) {
     if (exp.matched) continue;
@@ -177,9 +191,9 @@ function handleTap() {
   btn.classList.add('pressed'); setTimeout(() => btn.classList.remove('pressed'), 90);
   if (nearest) {
     nearest.matched = true;
-    if      (nearestDist < lv.interval * 0.12) { nearest.score=100; nearest.grade='perfect'; showFeedback('Perfect!','perfect'); }
-    else if (nearestDist < lv.interval * 0.22) { nearest.score=70;  nearest.grade='good';    showFeedback('Good!','good'); }
-    else                                        { nearest.score=35;  nearest.grade='ok';      showFeedback('Ok','ok'); }
+    if      (nearestDist < lv.interval * d.perfectT) { nearest.score=100;        nearest.grade='perfect'; showFeedback('Perfect!','perfect'); }
+    else if (nearestDist < lv.interval * d.goodT)    { nearest.score=d.goodPts;  nearest.grade='good';    showFeedback('Good!','good'); }
+    else                                              { nearest.score=d.okPts;    nearest.grade='ok';      showFeedback('Ok','ok'); }
     const el = gs.prevActiveEl;
     if (el) { el.classList.add(`hit-${nearest.grade}`); setTimeout(() => el.classList.remove(`hit-${nearest.grade}`), 200); }
   } else {
@@ -234,4 +248,13 @@ document.addEventListener('keydown', e => { if (e.code === 'Space' && !e.repeat)
 $('btn-retry').addEventListener('click', () => startLevel(gs.levelIdx));
 $('btn-next').addEventListener('click', () => { const n = gs.levelIdx+1; if (n < LEVELS.length && save.unlocked.includes(n)) startLevel(n); });
 
+document.querySelectorAll('.diff-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    save.difficulty = btn.dataset.diff;
+    writeSave();
+    renderDifficulty();
+  });
+});
+
 renderHome();
+renderDifficulty();
