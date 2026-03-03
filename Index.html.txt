@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Beat Tap</title>
+  <link href="<https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&display=swap>" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME SCREEN -->
+  <section id="s-home" class="screen active">
+    <div class="home-header">
+      <h1>Beat Tap</h1>
+      <p>Match the rhythm. Earn your score.</p>
+    </div>
+    <div id="level-list" class="level-list"></div>
+  </section>
+
+  <!-- GAME SCREEN -->
+  <section id="s-game" class="screen">
+    <div class="game-top">
+      <button id="btn-back" class="btn-icon">←</button>
+      <div class="game-info">
+        <span id="lv-name" class="lv-name"></span>
+        <span id="phase-tag" class="phase-tag">LISTEN</span>
+      </div>
+      <span id="loop-counter" class="loop-counter"></span>
+    </div>
+
+    <div class="beat-area">
+      <div id="beat-grid" class="beat-grid"></div>
+    </div>
+
+    <p id="game-message" class="game-message"></p>
+
+    <div class="tap-zone">
+      <button id="btn-tap" class="btn-tap" disabled>TAP</button>
+    </div>
+
+    <div id="feedback-popup" class="feedback-popup"></div>
+  </section>
+
+  <!-- RESULTS SCREEN -->
+  <section id="s-results" class="screen">
+    <div id="r-level" class="r-level"></div>
+    <div id="r-score-big" class="r-score-big"></div>
+    <div id="r-stars" class="r-stars"></div>
+    <div id="r-details" class="r-details"></div>
+    <div id="r-msg" class="r-msg"></div>
+    <div class="r-actions">
+      <button id="btn-retry" class="btn btn-outline">↺ Retry</button>
+      <button id="btn-next"  class="btn btn-primary">Next →</button>
+    </div>
+  </section>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
