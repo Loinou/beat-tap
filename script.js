@@ -75,7 +75,7 @@ function buildBeatGrid(lv) {
   lv.pattern.forEach((isTap, i) => {
     const cell = document.createElement('div');
     cell.className = 'beat-cell' + (isTap ? ' tap-beat' : '');
-    <cell.id> = `bc-${i}`;
+    cell.id = `bc-${i}`;
     grid.appendChild(cell);
   });
 }
